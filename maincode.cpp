@@ -1,137 +1,72 @@
 #include <iostream>
-#include <string>
 #include <cstdlib>
-#include <map>
+#include <ctime>
 using namespace std;
 
-class Bank
+class GuessTheNumberGame
 {
-    map<string, pair<string, double>> bank;
-    string id;
-    string password;
+private:
+    int computerGeneratedNumber; // Stores the randomly generated number
+    int userGuessedNumber; // Stores the user's guessed number
+    int maxAttempts; // User-defined maximum allowed attempts
 
 public:
-    void start()
+    // Constructor: Initializes the game by generating a random number and getting user input for attempts
+    GuessTheNumberGame()
     {
-        cout << "**********Welcome To Indi ATM**********" << endl
-             << "***Please select the option from below according to your need***" << endl;
-        char option;
-        do
-        {
-            printIntroMenu();
-            cin >> option;
-            switch (option)
-            {
-            case 'l':
-                login();
-                break;
-            case 'c':
-            {
-                create_new_account();
-                break;
-            }
-            case 'q':
-            {
-                cout << "Thanks using Indi ATM!\n";
-                break;
-            }
-            default:
-            {
-                cout << "Invalid option. Please select some other valid option.\n";
-                break;
-            }
-            }
-        } while (option != 'q');
-    }
-    void printIntroMenu()
-    {
-        cout << "Press 'l' for Login" << endl
-             << "Press 'c' for Create New Account" << endl
-             << "Press 'q' for Quit" << endl;
-    }
-    void printMainMenu()
-    {
-        cout << "Press 'd' for Deposit Money" << endl
-             << "Press 'w' for Withdraw Money" << endl
-             << "Press 'r' for Request Balance" << endl
-             << "Press 'q' for quit" << endl;
-    }
-    void create_new_account()
-    {
-        cout << "Please enter your user id: ";
-        cin >> id;
-        cout << "Please enter your password: ";
-        cin >> password;
-        bank[id] = make_pair(password, 0.0);
-        cout << "Thank You! Your account has been created!\n";
+        srand(static_cast<unsigned int>(time(nullptr))); // Seed the random number generator
+        generateRandomNumber(); // Generate a random number
+        getUserAttempts(); // Get user-defined maximum attempts
     }
 
-    void login()
+    // Generates a random number between 1 and 100
+    void generateRandomNumber()
     {
-        cout << "Please enter your user id: ";
-        cin >> id;
-        cout << "Please enter your password: ";
-        cin >> password;
-        if (bank.find(id) != bank.end() && bank[id].first == password)
+        computerGeneratedNumber = rand() % 100 + 1;
+    }
+
+    // Gets the desired number of attempts from the user
+    void getUserAttempts()
+    {
+        cout << "Enter the number of attempts you want: \n";
+        cout << "At most of the time a user needs minimum of 6 attempts to won the game.\n";
+        cin >> maxAttempts;
+    }
+
+    // Starts the game loop
+    void startTheGame()
+    {
+        int attempts = 0; // Counter for attempts made by the user
+
+        while (attempts < maxAttempts)
         {
-            cout << "Access Granted!\n";
-            char option;
-            do
+            attempts++;
+            cout << "Attempt " << attempts << ": Guess the number (between 1 and 100): \n";
+            cin >> userGuessedNumber;
+
+            if (userGuessedNumber < computerGeneratedNumber)
             {
-                printMainMenu();
-                cin >> option;
-                switch (option)
-                {
-                case 'd':
-                {
-                    double amount;
-                    cout << "Amount of deposit: $";
-                    cin >> amount;
-                    bank[id].second += amount;
-                    break;
-                }
-                case 'w':
-                {
-                    double amount;
-                    cout << "Amount of withdrawal: $";
-                    cin >> amount;
-                    if (amount <= bank[id].second)
-                    {
-                        bank[id].second -= amount;
-                    }
-                    else
-                    {
-                        cout << "Insufficient balance.\n";
-                    }
-                    break;
-                }
-                case 'r':
-                {
-                    cout << "Your balance is $" << bank[id].second << ".\n";
-                    break;
-                }
-                case 'q':
-                {
-                    cout << "Thanks for stopping by!\n";
-                    break;
-                }
-                default:
-                {
-                    cout << "Invalid option. Please try again.\n";
-                    break;
-                }
-                }
-            } while (option != 'q');
+                cout << "Guessed number is smaller than the computer-generated number.\n";
+            }
+            else if (userGuessedNumber > computerGeneratedNumber)
+            {
+                cout << "Guessed number is greater than the computer-generated number.\n";
+            }
+            else
+            {
+                cout << "Congratulations! You won the game in " << attempts << " attempts.\n";
+                cout << "Your score is " << attempts << ".\n";
+                return; // Exit the loop if the user guesses correctly
+            }
         }
-        else
-        {
-            cout << "******** LOGIN FAILED! ********\n";
-        }
+
+        cout << "You lose! The correct number was " << computerGeneratedNumber << ". Better luck next time!\n";
     }
 };
+
 int main()
 {
-    Bank obj;
-    obj.start();
+    GuessTheNumberGame game; // Create an instance of the game
+    game.startTheGame(); // Start the game loop
     return 0;
 }
